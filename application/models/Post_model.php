@@ -21,11 +21,11 @@ class Post_model extends CI_Model
             $this->db->order_by('posts.post_id' , 'DESC');
             $this->db->join('categories' , 'categories.category_id = posts.category_id');
             $query = $this->db->get('posts');
-            return $query->result_array();
+            return $query->result();
         }
 
         $query = $this->db->get_where('posts' , array('slug' => $slug));
-        return $query->row_array();
+        return $query->row();
     }
 
 
@@ -73,8 +73,20 @@ class Post_model extends CI_Model
         $this->db->order_by("post_id" , "DESC");
         $this->db->join('categories' , 'categories.category_id = posts.category_id');
         $query= $this->db->get_where('posts' , ['category_id' => $category_id]);
-        return $query->result_array();
+        return $query->result();
     }
+
+
+        public function approve_post($post_id)
+    {
+        $data = array(
+            'approved' => '1'
+        );
+
+        $this->db->where('post_id' , $post_id);
+        return $this->db->update('posts' , $data);
+    }
+
 
 
 }
