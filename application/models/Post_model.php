@@ -7,30 +7,35 @@ class Post_model extends CI_Model
     public function __construct ()
     {
         $this->load->database();
+        $this->load->model('category_model');
     }
 
-    public function get_post ($slug = false , $offset = false , $limit = false )
+    public function get_post ($slug = false , $post_id = false)
     {   
-        if($limit)
-        {
-            $this->db->limit($limit , $offset);
-        }
-
-        if ($slug == false)
+        if ($slug == false && $post_id == false)
         {
             $this->db->order_by('posts.post_id' , 'DESC');
-            $this->db->join('categories' , 'categories.category_id = posts.category_id');
+            $this->db->where([ 'approved' => 1 ]);
             $query = $this->db->get('posts');
-            return $query->result();
+            $result = $query->result();
+            return $result;
         }
 
-        $query = $this->db->get_where('posts' , array('slug' => $slug));
+        $query = $this->db->get_where('posts' , array( 'post_id' => $post_id , 'approved' => '1'));
         return $query->row();
     }
 
 
     public function create_post()
     {
+        if($this->session->user_level == 'admin')
+        {
+            $approved = '1';
+        }
+        else
+        {
+            $approved = '0';
+        }
         $slug = url_title( $this->input->post('title') , '-'  , true);
 
         $data = array(
@@ -38,7 +43,8 @@ class Post_model extends CI_Model
             'category_id' => $this->input->post('category_id'),
             'title' => $this->input->post('title'),
             'slug' => $slug,
-            'content' => $this->input->post('content')
+            'content' => $this->input->post('content'),
+            'approved' => $approved
         );
 
         return $this->db->insert('posts' , $data);
@@ -73,7 +79,7 @@ class Post_model extends CI_Model
         $this->db->order_by("post_id" , "DESC");
         $this->db->join('categories' , 'categories.category_id = posts.category_id');
         $query= $this->db->get_where('posts' , ['category_id' => $category_id]);
-        return $query->result();
+        return $query->result_array();
     }
 
 

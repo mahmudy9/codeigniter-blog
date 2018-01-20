@@ -13,7 +13,7 @@ class User_model extends CI_Model
     }
 
 
-    public function is_user_admin($user_id)
+    public function is_admin($user_id)
     {
         $this->db->where('user_id' , $user_id);
         $query = $this->db->get('users');
@@ -33,7 +33,7 @@ class User_model extends CI_Model
     public function register()
     {
         $email = strtolower($this->input->post('email'));
-        $pass = password_hash($this->input->post('pass') , PASSWORD_DEFAULT );
+        $pass = password_hash($this->input->post('password') , PASSWORD_DEFAULT );
         $userName = $this->random_username($email);
         $data = [
             'name' => $this->input->post('name'),
@@ -58,7 +58,17 @@ class User_model extends CI_Model
            $password = $row->password;
            if(password_verify($this->input->post('password') , $password ))
            {
-               return true;
+               if( $this->is_admin($row->user_id) )
+               {
+                    $this->session->user_level = 'admin';
+                    return true;
+               }
+               else
+               {
+                    $this->session->user_level = 'user';
+                    return true;
+               }
+                   
            }
            else
            {
@@ -73,18 +83,19 @@ class User_model extends CI_Model
 
 
 
-    public function login_with_email ()
+    public function login_with_email ($email , $passwordin)
     {
-        $email = $this->input->post('login');
         $query = $this->db->get_where('users' , ['email' => $email] );
 
-        if($query -> num_rows() == 1 )
+        if($query->num_rows() == 1 )
         {
-           $row = $query->row();
-           $password = $row->password;
-           if(password_verify($this->input->post('password') , $password ))
+           $row = $query->row_array();
+           $password = $row['password'];
+           if(password_verify($passwordin , $password ))
            {
-               return true;
+                
+                return $row;
+            
            }
            else
            {
@@ -99,8 +110,15 @@ class User_model extends CI_Model
     }
 
 
+    public function get_user_name($id)
+    {
+        $query = $this->db->get_where('users' , ['user_id' => $id]);
+        $result = $query->row();
+        return $result->name;
+    }
 
-    function random_username($email) 
+
+    public function random_username($email) 
     {
         $name = strstr($email , "@" , true);
         $randNum = random_int(0 , 100);

@@ -18,6 +18,17 @@ class Category_model extends CI_Model
         return $query->result();
     }
 
+    public function get_category($id)
+    {
+        $this->db->where(['category_id' => $id]);
+        $query = $this->db->get('categories');
+         $results = $query->row();
+         //foreach($results as $result):
+         return $results->name;
+         //endforeach;
+    }
+
+
 
     public function create_category()
     {

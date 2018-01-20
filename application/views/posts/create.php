@@ -1,8 +1,3 @@
-<?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-?>
-
-
     <main role="main">
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -22,22 +17,33 @@ echo '<div class="alert alert-danger" role="alert">';
 echo validation_errors();
 echo "</div>";
 endif;  ?>
-            <?php echo form_open('user/login') ?>
+
+            <?php echo form_open('posts/create') ?>
               <div class="form-group">
-    <label for="exampleFormControlInput1">email</label>
-    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="email" name = "email" value="<?php echo set_value('email');  ?>">
+    <label for="exampleFormControlInput1">Title</label>
+    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Title" name = "title" >
   </div>
-              <div class="form-group">
-    <label for="exampleFormControlInput1">password</label>
-    <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="password" name = "password" >
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Select Category</label>
+    <select class="form-control" name="category_id" >
+        <?php foreach($categories as $category): ?>
+        <option value="<?php echo $category->category_id;  ?>"><?php echo $category->name; ?></option>
+<?php endforeach; ?>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="exampleFormControlTextarea1">Example textarea</label>
+    <textarea class="form-control" id="mytext" name="content" rows="6"></textarea>
   </div>
 
-              <div class="form-group">
-    <label for="exampleFormControlInput1"></label>
-    <input type="submit" class="btn btn-primary" id="exampleFormControlInput1"  name = "submit" value="Log In" >
+    <div class="form-group">
+    <label for="exampleFormControlTextarea1">Example textarea</label>
+    <input type="submit" class="btn btn-primary" name="submit" value="create post" >
   </div>
 
-        <?php echo form_close(); ?>
+
+
+            </form>       
           </div><!-- /.blog-post -->
           </div>
           </div>
